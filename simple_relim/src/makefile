@@ -17,7 +17,7 @@
 #   make ADDFLAGS=-D_FILE_OFFSET_BITS=64
 #-----------------------------------------------------------------------
 SHELL    = /bin/bash
-THISDIR  = ../../relim/src
+THISDIR  = ../../simple_relim/src
 UTILDIR  = ../../util/src
 TRACTDIR = ../../tract/src
 
@@ -25,7 +25,7 @@ CC       = gcc-9.1 -std=c99
 CFBASE   = -Wall -Wextra -Wno-unused-parameter -Wconversion \
            -pedantic -c $(ADDFLAGS)
 CFLAGS   = $(CFBASE) -DNDEBUG -O3 -funroll-loops
-# CFLAGS   = $(CFBASE) -g
+CFLAGS   = $(CFBASE) -g
 # CFLAGS   = $(CFBASE) -g -DSTORAGE
 INCS     = -I$(UTILDIR) -I$(TRACTDIR)
 
@@ -55,7 +55,7 @@ PRGS     = simple_relim
 #-----------------------------------------------------------------------
 all:          $(PRGS)
 
-relim:        $(OBJS) makefile
+simple_relim:        $(OBJS) makefile
 	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
 
 #-----------------------------------------------------------------------
