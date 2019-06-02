@@ -1265,18 +1265,29 @@ int relim_mine (RELIM *relim, ITEM sort)
   assert(relim);                /* check the function arguments */
   CLOCK(t);                     /* start timer, print log message */
   printf("--- relim_mine ---\n");
+  XMSG(stderr, "mode4 = %x\n", relim->mode);
   XMSG(stderr, "writing %s ... ", isr_name(relim->report));
   relim->sort = sort;           /* note the sorting threshold */
-  if      (relim->twgt >  0)
+  if      (relim->twgt >  0) {
+    XMSG(stderr, "relim_lim\n ");
     r = relim_lim (relim);      /* limited   item insertions */
-  else if (relim->twgt >= 0)
+  }
+  else if (relim->twgt >= 0) {
+    XMSG(stderr, "relim_ins\n ");
     r = relim_ins (relim);      /* unlimited item insertions */
-  else if (relim->algo == REL_TREE)
+  }
+  else if (relim->algo == REL_TREE) {
+    XMSG(stderr, "relim_m16\n ");
     r = relim_tree(relim);      /* tree-based algorithm */
-  else if (relim->mode & REL_FIM16)
+  }
+  else if (relim->mode & REL_FIM16) {
+    XMSG(stderr, "relim_m16\n ");
     r = relim_m16 (relim);      /* using a 16 items machine */
-  else
+  }
+  else {
+    XMSG(stderr, "relim_base\n ");
     r = relim_base(relim);      /* standard list-based algorithm */
+  }
   if (r < 0) return E_NOMEM;    /* search for frequent item sets */
   XMSG(stderr, "[%"SIZE_FMT" set(s)]", isr_repcnt(relim->report));
   XMSG(stderr, " done [%.2fs].\n", SEC_SINCE(t));
@@ -1432,6 +1443,8 @@ int main (int argc, char *argv[])
   prgname = argv[0];            /* get program name for error msgs. */
 
   fprintf(stderr, "\nPshemy welcomes you to the simple_relim!\n\n"); 
+  mode = (REL_PERFECT|REL_FIM16|REL_PREFMT);
+  mode = 0;
 
   /* --- print usage message --- */
   if (argc > 1) {               /* if arguments are given */
@@ -1609,8 +1622,10 @@ int main (int argc, char *argv[])
     case 't': algo = REL_TREE;               break;
     default : error(E_VARIANT, (char)algo);  break;
   }                             /* (get fpgrowth algorithm code) */
+  printf("mode2 = %x\n", mode);
   mode = (mode & ~REL_FIM16)    /* add packed items to search mode */
        | ((pack <= 0) ? 0 : (pack < 16) ? pack : 16);
+  printf("mode3 = %x\n", mode);
   if (slist < 0) slist = ITEM_MAX;
   if (info == dflt)             /* adapt the default info. format */
     info = (supp < 0) ? " (%a)" : " (%S)";
