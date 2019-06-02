@@ -461,6 +461,10 @@ static int recurse (RELIM *relim, TSLIST *lists, ITEM k, TID n)
 
 /*--------------------------------------------------------------------*/
 
+//
+// Our target for analysis
+//
+// taking opaque structure pointer as an input argument
 int relim_base (RELIM *relim)
 {                               /* --- recursive elimination (arrays) */
   int    r;                     /* result of recursion */
@@ -470,17 +474,27 @@ int relim_base (RELIM *relim)
   TSLIST *lists, *tal;          /* (array of) transaction list(s) */
   TSLE   *elems, *dst;          /* (array of) trans. list element(s) */
 
+  // check if relim is null
   assert(relim);                /* check the function arguments */
+
+  // transaction bag weight
   if (tbg_wgt(relim->tabag) < relim->supp)
     return 0;                   /* check the total transaction weight */
+
   k = tbg_itemcnt(relim->tabag);/* get and check the number of items */
-  if (k <= 0) return isr_report(relim->report);
+  if (k <= 0)
+    return isr_report(relim->report);
+
   n = tbg_cnt(relim->tabag);    /* get the number of transactions */
+
+  // allocate memory for the transaction list
   lists = (TSLIST*)malloc((size_t)k *sizeof(TSLIST)
                          +(size_t)n *sizeof(TSLE));
+
   if (!lists) return -1;        /* allocate lists and element arrays */
   dst = elems = (TSLE*)(lists +k);       /* and initialize the lists */
   memset(lists, 0, (size_t)k *sizeof(TSLIST));
+
   while (--n >= 0) {            /* traverse the transactions */
     t = tbg_tract(relim->tabag, n); /* get the current transaction */
     dst->items = ta_items(t);       /* and its item array */
