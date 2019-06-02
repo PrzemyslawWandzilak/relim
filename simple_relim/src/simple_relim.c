@@ -1264,6 +1264,7 @@ int relim_mine (RELIM *relim, ITEM sort)
 
   assert(relim);                /* check the function arguments */
   CLOCK(t);                     /* start timer, print log message */
+  printf("--- relim_mine ---\n");
   XMSG(stderr, "writing %s ... ", isr_name(relim->report));
   relim->sort = sort;           /* note the sorting threshold */
   if      (relim->twgt >  0)
@@ -1523,6 +1524,7 @@ int main (int argc, char *argv[])
   /* free option characters: acjop [A-Z]\[CFNPRTZ] */
 
   /* --- evaluate arguments --- */
+  printf("--- evaluate arguments ---\n");
   for (i = 1; i < argc; i++) {  /* traverse arguments */
     s = argv[i];                /* get option argument */
     if (optarg) { *optarg = s; optarg = NULL; continue; }
@@ -1615,6 +1617,7 @@ int main (int argc, char *argv[])
   MSG(stderr, "\n");            /* terminate the startup message */
   mode |= REL_VERBOSE|REL_NOCLEAN;
 
+  printf("--- read item selection/insertion penalties ---\n");
   /* --- read item selection/insertion penalties --- */
   ibase = ib_create(0, 0);      /* create an item base */
   if (!ibase) error(E_NOMEM);   /* to manage the items */
@@ -1635,6 +1638,8 @@ int main (int argc, char *argv[])
     MSG(stderr, " done [%.2fs].\n", SEC_SINCE(t));
   }                             /* print a log message */
 
+  printf("--- read item selection/insertion penalties ---\n");
+  //XMSG(stderr, "--- read transaction database ---");
   /* --- read transaction database --- */
   tabag = tbg_create(ibase);    /* create a transaction bag */
   if (!tabag) error(E_NOMEM);   /* to store the transactions */
@@ -1656,6 +1661,9 @@ int main (int argc, char *argv[])
     error(E_NOITEMS);           /* and at least one transaction */
   MSG(stderr, "\n");            /* terminate the log message */
 
+  printf("\n\n");
+  printf("--- find frequent item sets ---\n");
+  //XMSG(stderr, "--- find frequent item sets ---");
   /* --- find frequent item sets --- */
   relim = relim_create(target, supp, sins, zmin, zmax, tnorm, twgt,
                        eval, thresh, algo, mode);
@@ -1683,6 +1691,8 @@ int main (int argc, char *argv[])
   if (isr_close(report) != 0)   /* close item set output file */
     error(E_FWRITE, isr_name(report));
 
+  printf("\n\n");
+  printf("--- write pattern spectrum ---\n");
   /* --- write pattern spectrum --- */
   if (fn_psp) {                 /* if to write a pattern spectrum */
     CLOCK(t);                   /* start timer, create table write */
