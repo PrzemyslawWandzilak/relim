@@ -29,7 +29,7 @@ CFLAGS   = $(CFBASE) -DNDEBUG -O3 -funroll-loops
 # CFLAGS   = $(CFBASE) -g -DSTORAGE
 INCS     = -I$(UTILDIR) -I$(TRACTDIR)
 
-LD       = gcc
+LD       = gcc-9.1
 LDFLAGS  = $(ADDFLAGS)
 LIBS     = -lm $(ADDLIBS)
 
@@ -47,7 +47,7 @@ OBJS     = $(UTILDIR)/arrays.o   $(UTILDIR)/memsys.o   \
            $(UTILDIR)/scform.o   $(TRACTDIR)/taread.o  \
            $(TRACTDIR)/patspec.o $(TRACTDIR)/clomax.o  \
            $(TRACTDIR)/repcm.o   $(TRACTDIR)/fim16.o   \
-           relim.o $(ADDOBJS)
+           simple_relim.o $(ADDOBJS)
 PRGS     = relim
 
 #-----------------------------------------------------------------------
@@ -61,12 +61,12 @@ relim:        $(OBJS) makefile
 #-----------------------------------------------------------------------
 # Main Program
 #-----------------------------------------------------------------------
-relim.o:      $(HDRS)
-relim.o:      relim.h relim.c makefile
-	$(CC) $(CFLAGS) $(INCS) -DRELIM_MAIN relim.c -o $@
+simple_relim.o:      $(HDRS)
+simple_relim.o:      relim.h simple_relim.c makefile
+	$(CC) $(CFLAGS) $(INCS) -DRELIM_MAIN simple_relim.c -o $@
 
-relim.d:      relim.c
-	$(CC) -MM $(CFLAGS) $(INCS) -DRELIM_MAIN relim.c > relim.d
+relim.d:      simple_relim.c
+	$(CC) -MM $(CFLAGS) $(INCS) -DRELIM_MAIN simple_relim.c > relim.d
 
 #-----------------------------------------------------------------------
 # External Modules
@@ -125,7 +125,7 @@ dist:
 # Installation
 #-----------------------------------------------------------------------
 install:
-	cp $(PRGS) $(HOME)/bin
+	cp $(PRGS) $(HOME)/Documents/Devel/bin/simple_relim
 
 #-----------------------------------------------------------------------
 # Clean up

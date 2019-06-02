@@ -2,6 +2,7 @@
   File    : relim.c
   Contents: relim algorithm for finding frequent item sets
   Author  : Christian Borgelt
+  Editor  : Pshemy Wandzillak
   History : 2004.11.05 file created from eclat.c
             2004.11.17 first reasonably fast version completed
             2004.11.18 start of loop over transactions lists improved
@@ -111,6 +112,8 @@
                     "with a recursive elimination algorithm"
 #define VERSION     "version 4.24 (2017.07.06)        " \
                     "(c) 2004-2017   Christian Borgelt"
+#define SIMPLE_VERSION     "version 1.08 (2019.06.01)        " \
+                    "(c) 2019        Editor: Pshemy Wandzilak"
 
 /* --- error codes --- */
 /* error codes   0 to  -4 defined in tract.h */
@@ -1297,6 +1300,7 @@ int relim_mine (RELIM *relim, ITEM sort)
 
   assert(relim);                /* check the function arguments */
   CLOCK(t);                     /* start timer, print log message */
+  printf("--- relim_mine ---\n");
   XMSG(stderr, "writing %s ... ", isr_name(relim->report));
   relim->sort = sort;           /* note the sorting threshold */
   if      (relim->twgt >  0)
@@ -1463,14 +1467,18 @@ int main (int argc, char *argv[])
 
   prgname = argv[0];            /* get program name for error msgs. */
 
+  fprintf(stderr, "\nPshemy welcomes you to the simple_relim!\n\n"); 
+
   /* --- print usage message --- */
   if (argc > 1) {               /* if arguments are given */
     fprintf(stderr, "%s - %s\n", argv[0], DESCRIPTION);
-    fprintf(stderr, VERSION); } /* print a startup message */
+    fprintf(stderr, VERSION);  /* print a startup message */
+    fprintf(stderr, SIMPLE_VERSION); } /* print a startup message */
   else {                        /* if no arguments given */
     printf("usage: %s [options] infile [outfile]\n", argv[0]);
     printf("%s\n", DESCRIPTION);
     printf("%s\n", VERSION);
+    printf("%s\n", SIMPLE_VERSION);
     printf("-t#      target type                              "
                     "(default: %c)\n", target);
     printf("         (s: frequent, c: closed, m: maximal item sets)\n");
@@ -1485,63 +1493,63 @@ int main (int argc, char *argv[])
     printf("-i#      minimum support with item insertions     "
                     "(default: %g%%)\n", sins);
     printf("         (only with item insertions, option -u)\n");
-    printf("-T#      t-norm for combining item penalties      "
-                    "(default: %c)\n",   tnorm);
-    printf("-u#      minimum weight of a transaction          "
-                    "(default: %g)\n",   twgt);
-    printf("         (a value >= 0 selects item insertions)\n");
-    printf("-e#      additional evaluation measure            "
-                    "(default: none)\n");
-    printf("-d#      threshold for add. evaluation measure    "
-                    "(default: %g%%)\n", thresh);
-    printf("-q#      sort items w.r.t. their frequency        "
-                    "(default: %d)\n", sort);
-    printf("         (1: ascending, -1: descending, 0: do not sort,\n"
-           "          2: ascending, -2: descending w.r.t. "
-                    "transaction size sum)\n");
-    printf("-A#      variant of the relim algorithm to use    "
-                    "(default: %c)\n", algo);
-    printf("-x       do not prune with perfect extensions     "
-                    "(default: prune)\n");
-    printf("-l#      number of items for k-items machine      "
-                    "(default: %d)\n", pack);
-    printf("-y#      threshold for transaction list sorting   "
-                    "(default: %"ITEM_FMT")\n", slist);
-    printf("-F#:#..  support border for filtering item sets   "
-                    "(default: none)\n");
-    printf("         (list of minimum support values, "
-                    "one per item set size,\n");
-    printf("         starting at the minimum size, "
-                    "as given with option -m#)\n");
-    printf("-R#      read item selection/insertion penalties\n");
-    printf("-P#      write a pattern spectrum to a file\n");
-    printf("-Z       print item set statistics "
-                    "(number of item sets per size)\n");
-    printf("-N       do not pre-format some integer numbers   "
-                    "(default: do)\n");
-    printf("-g       write output in scanable form "
-                    "(quote certain characters)\n");
-    #ifdef USE_ZLIB             /* if optional output compression */
-    printf("-z       compress output with zlib (deflate)      "
-                    "(default: plain text)\n");
-    #endif                      /* print compression option */
-    printf("-h#      record header  for output                "
-                    "(default: \"%s\")\n", hdr);
-    printf("-k#      item separator for output                "
-                    "(default: \"%s\")\n", sep);
-    printf("-v#      output format for item set information   "
-                    "(default: \"%s\")\n", info);
-    printf("-w       integer transaction weight in last field "
-                    "(default: only items)\n");
-    printf("-r#      record/transaction separators            "
-                    "(default: \"\\n\")\n");
-    printf("-f#      field /item        separators            "
-                    "(default: \" \\t,\")\n");
-    printf("-b#      blank   characters                       "
-                    "(default: \" \\t\\r\")\n");
-    printf("-C#      comment characters                       "
-                    "(default: \"#\")\n");
-    printf("-!       print additional option information\n");
+//    printf("-T#      t-norm for combining item penalties      "
+//                    "(default: %c)\n",   tnorm);
+//    printf("-u#      minimum weight of a transaction          "
+//                    "(default: %g)\n",   twgt);
+//    printf("         (a value >= 0 selects item insertions)\n");
+//    printf("-e#      additional evaluation measure            "
+//                    "(default: none)\n");
+//    printf("-d#      threshold for add. evaluation measure    "
+//                    "(default: %g%%)\n", thresh);
+//    printf("-q#      sort items w.r.t. their frequency        "
+//                    "(default: %d)\n", sort);
+//    printf("         (1: ascending, -1: descending, 0: do not sort,\n"
+//           "          2: ascending, -2: descending w.r.t. "
+//                    "transaction size sum)\n");
+//    printf("-A#      variant of the relim algorithm to use    "
+//                    "(default: %c)\n", algo);
+//    printf("-x       do not prune with perfect extensions     "
+//                    "(default: prune)\n");
+//    printf("-l#      number of items for k-items machine      "
+//                    "(default: %d)\n", pack);
+//    printf("-y#      threshold for transaction list sorting   "
+//                    "(default: %"ITEM_FMT")\n", slist);
+//    printf("-F#:#..  support border for filtering item sets   "
+//                    "(default: none)\n");
+//    printf("         (list of minimum support values, "
+//                    "one per item set size,\n");
+//    printf("         starting at the minimum size, "
+//                    "as given with option -m#)\n");
+//    printf("-R#      read item selection/insertion penalties\n");
+//    printf("-P#      write a pattern spectrum to a file\n");
+//    printf("-Z       print item set statistics "
+//                    "(number of item sets per size)\n");
+//    printf("-N       do not pre-format some integer numbers   "
+//                    "(default: do)\n");
+//    printf("-g       write output in scanable form "
+//                    "(quote certain characters)\n");
+//    #ifdef USE_ZLIB             /* if optional output compression */
+//    printf("-z       compress output with zlib (deflate)      "
+//                    "(default: plain text)\n");
+//    #endif                      /* print compression option */
+//    printf("-h#      record header  for output                "
+//                    "(default: \"%s\")\n", hdr);
+//    printf("-k#      item separator for output                "
+//                    "(default: \"%s\")\n", sep);
+//    printf("-v#      output format for item set information   "
+//                    "(default: \"%s\")\n", info);
+//    printf("-w       integer transaction weight in last field "
+//                    "(default: only items)\n");
+//    printf("-r#      record/transaction separators            "
+//                    "(default: \"\\n\")\n");
+//    printf("-f#      field /item        separators            "
+//                    "(default: \" \\t,\")\n");
+//    printf("-b#      blank   characters                       "
+//                    "(default: \" \\t\\r\")\n");
+//    printf("-C#      comment characters                       "
+//                    "(default: \"#\")\n");
+//    printf("-!       print additional option information\n");
     printf("infile   file to read transactions from           "
                     "[required]\n");
     printf("outfile  file to write frequent item sets to      "
@@ -1552,6 +1560,7 @@ int main (int argc, char *argv[])
   /* free option characters: acjop [A-Z]\[CFNPRTZ] */
 
   /* --- evaluate arguments --- */
+  printf("--- evaluate arguments ---\n");
   for (i = 1; i < argc; i++) {  /* traverse arguments */
     s = argv[i];                /* get option argument */
     if (optarg) { *optarg = s; optarg = NULL; continue; }
@@ -1644,6 +1653,7 @@ int main (int argc, char *argv[])
   MSG(stderr, "\n");            /* terminate the startup message */
   mode |= REL_VERBOSE|REL_NOCLEAN;
 
+  printf("--- read item selection/insertion penalties ---\n");
   /* --- read item selection/insertion penalties --- */
   ibase = ib_create(0, 0);      /* create an item base */
   if (!ibase) error(E_NOMEM);   /* to manage the items */
@@ -1664,6 +1674,8 @@ int main (int argc, char *argv[])
     MSG(stderr, " done [%.2fs].\n", SEC_SINCE(t));
   }                             /* print a log message */
 
+  printf("--- read item selection/insertion penalties ---\n");
+  //XMSG(stderr, "--- read transaction database ---");
   /* --- read transaction database --- */
   tabag = tbg_create(ibase);    /* create a transaction bag */
   if (!tabag) error(E_NOMEM);   /* to store the transactions */
@@ -1685,6 +1697,9 @@ int main (int argc, char *argv[])
     error(E_NOITEMS);           /* and at least one transaction */
   MSG(stderr, "\n");            /* terminate the log message */
 
+  printf("\n\n");
+  printf("--- find frequent item sets ---\n");
+  //XMSG(stderr, "--- find frequent item sets ---");
   /* --- find frequent item sets --- */
   relim = relim_create(target, supp, sins, zmin, zmax, tnorm, twgt,
                        eval, thresh, algo, mode);
@@ -1692,19 +1707,24 @@ int main (int argc, char *argv[])
   k = relim_data(relim, tabag, sort);
   if (k) error(k);              /* prepare data for split and merge */
   report = isr_create(ibase);   /* create an item set reporter */
+
   if (!report) error(E_NOMEM);  /* and configure it */
   k = relim_report(relim, report);
   if (k) error(k);              /* prepare reporter for relim */
   if (setbdr(report, w, zmin, &border, bdrcnt) != 0)
+    printf("--- err 01 ---\n");
     error(E_NOMEM);             /* set the support border */
   if (fn_psp && (isr_addpsp(report, NULL) < 0))
+    printf("--- err 02 ---\n");
     error(E_NOMEM);             /* set a pattern spectrum if req. */
   if (isr_setfmt(report, scan, hdr, sep, NULL, info) != 0)
+    printf("--- err 03 ---\n");
     error(E_NOMEM);             /* set the output format strings */
   k = isr_open(report, NULL, fn_out);
   if (k) error(k, isr_name(report));
   if (isr_setup(report) < 0)     /* open the item set file and */
     error(E_NOMEM);              /* set up the item set reporter */
+  printf("--- relim_mine ---\n");
   k = relim_mine(relim, slist);  /* find frequent item sets */
   if (k) error(k);
   if (stats)                    /* print item set statistics */
@@ -1712,6 +1732,8 @@ int main (int argc, char *argv[])
   if (isr_close(report) != 0)   /* close item set output file */
     error(E_FWRITE, isr_name(report));
 
+  printf("\n\n");
+  printf("--- write pattern spectrum ---\n");
   /* --- write pattern spectrum --- */
   if (fn_psp) {                 /* if to write a pattern spectrum */
     CLOCK(t);                   /* start timer, create table write */
@@ -1736,3 +1758,4 @@ int main (int argc, char *argv[])
 }  /* main() */
 
 #endif
+
