@@ -48,7 +48,7 @@ OBJS     = $(UTILDIR)/arrays.o   $(UTILDIR)/memsys.o   \
            $(TRACTDIR)/patspec.o $(TRACTDIR)/clomax.o  \
            $(TRACTDIR)/repcm.o   $(TRACTDIR)/fim16.o   \
            simple_relim.o $(ADDOBJS)
-PRGS     = relim
+PRGS     = simple_relim
 
 #-----------------------------------------------------------------------
 # Build Program
