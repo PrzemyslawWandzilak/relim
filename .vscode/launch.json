@@ -12,7 +12,8 @@
       "request": "launch",
       //"program": "${fileDirname}/${fileBasenameNoExtension}",
       "program": "${workspaceFolder}/simple_relim/src/simple_relim",
-      "args": ["simple_relim/ex/BMS-WebView-1.dat", "simple_relim/ex/out.txt", "-s-38m1n5"],
+      //support 38, min 1, max 5, k-items 0. 
+      "args": ["simple_relim/ex/BMS-WebView-1.dat", "simple_relim/ex/out.txt", "-s-38m1n5l0"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
