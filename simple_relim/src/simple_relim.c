@@ -2,24 +2,59 @@
   File    : relim.c
   Contents: relim algorithm for finding frequent item sets
   Author  : Christian Borgelt
-  Editor  : Pshemy Wandzillak
-  History : 
-            2004.11.05 file created from eclat.c
+  History : 2004.11.05 file created from eclat.c
             2004.11.17 first reasonably fast version completed
-            (..)
+            2004.11.18 start of loop over transactions lists improved
+            2004.11.23 absolute/relative support output changed
+            2004.12.09 filter added (binary logarithm of supp. quotient)
+            2005.06.20 use of flag for "no item sorting" corrected
+            2006.11.26 adapted to new structures ISFMTR and ISEVAL
+            2007.02.13 adapted to modified module tabread
+            2008.05.02 default limit for maximal number of items removed
+            2008.10.13 adapted to modified module "tract", some redesign
+            2008.10.15 simplification of the recursion parameters
+            2008.10.29 reading item insertion penalties added
+            2008.11.03 mining with insertion penalties added
+            2008.11.11 adapted to insertion penalties in item base
+            2008.11.13 adapted to changes in transaction management
+            2008.11.19 sorting transaction list before processing added
+            2008.12.05 perfect extension pruning added (optional)
+            2008.12.11 special function for unlimited insertions added
+            2009.05.28 adapted to modified function tbg_filter()
+            2009.10.15 adapted to item set counter in reporter
+            2009.10.16 closed and maximal item set mining added
+            2010.03.04 sorting improved (appending the rest list)
+            2010.03.10 projection memory combined into one block
             2010.03.15 bug in combined memory deallocation fixed
-            (..)
             2010.03.18 recording of actual number of occurrences added
             2010.04.07 threshold for both item set support and weight
-            (..)
             2010.07.14 output file made optional (for benchmarking)
-            (..)
+            2010.08.19 item selection file added as optional input
+            2010.08.22 adapted to modified modules tabread and tract
+            2010.10.15 adapted to modified interface of module report
+            2010.11.05 clearer interpretation of minimum support
+            2010.11.24 adapted to modified error reporting (tract)
+            2010.12.11 adapted to a generic error reporting function
+            2011.03.16 closed/maximal item sets with item insertions
+            2011.03.20 optional integer transaction weights added
+            2011.05.30 item weight combination with t-norms added
+            2011.06.02 initialize header table with memset()
+            2011.07.08 adapted to modified function tbg_recode()
+            2011.08.28 output of item set counters per size added
+            2011.08.29 16 items machine added (without item insertions)
+            2013.04.01 adapted to type changes in module tract
+            2013.10.15 checks of return code of isr_report() added
+            2013.10.18 optional pattern spectrum collection added
+            2013.11.12 item insertion penalties changed to option -R#
+            2014.05.12 option -F# added (support border for filtering)
+            2014.08.02 option -c renamed to -i (min. supp. with insert.)
+            2014.08.28 functions rel_data() and rel_report() added
+            2014.10.24 changed from LGPL license to MIT license
+            2016.02.19 added pre-formatting for some integer numbers
             2016.11.25 relim miner object and interface introduced
             2017.05.30 optional output compression with zlib added
             2017.07.04 tree-based algorithm variant added
             2017.07.06 use of 16-items machine in tree-based algorithm
-            (..)
-            2019.06.01 Pshemy: move history to git
 ------------------------------------------------------------------------
   Reference for the RElim algorithm:
     C. Borgelt.
@@ -76,8 +111,6 @@
                     "with a recursive elimination algorithm"
 #define VERSION     "version 4.24 (2017.07.06)        " \
                     "(c) 2004-2017   Christian Borgelt"
-#define SIMPLE_VERSION     "version 1.08 (2019.06.01)        " \
-                    "(c) 2019        Editor: Pshemy Wandzilak"
 
 /* --- error codes --- */
 /* error codes   0 to  -4 defined in tract.h */
@@ -1264,7 +1297,6 @@ int relim_mine (RELIM *relim, ITEM sort)
 
   assert(relim);                /* check the function arguments */
   CLOCK(t);                     /* start timer, print log message */
-  printf("--- relim_mine ---\n");
   XMSG(stderr, "writing %s ... ", isr_name(relim->report));
   relim->sort = sort;           /* note the sorting threshold */
   if      (relim->twgt >  0)
@@ -1431,18 +1463,14 @@ int main (int argc, char *argv[])
 
   prgname = argv[0];            /* get program name for error msgs. */
 
-  fprintf(stderr, "\nPshemy welcomes you to the simple_relim!\n\n"); 
-
   /* --- print usage message --- */
   if (argc > 1) {               /* if arguments are given */
     fprintf(stderr, "%s - %s\n", argv[0], DESCRIPTION);
-    fprintf(stderr, VERSION);  /* print a startup message */
-    fprintf(stderr, SIMPLE_VERSION); } /* print a startup message */
+    fprintf(stderr, VERSION); } /* print a startup message */
   else {                        /* if no arguments given */
     printf("usage: %s [options] infile [outfile]\n", argv[0]);
     printf("%s\n", DESCRIPTION);
     printf("%s\n", VERSION);
-    printf("%s\n", SIMPLE_VERSION);
     printf("-t#      target type                              "
                     "(default: %c)\n", target);
     printf("         (s: frequent, c: closed, m: maximal item sets)\n");
@@ -1457,63 +1485,63 @@ int main (int argc, char *argv[])
     printf("-i#      minimum support with item insertions     "
                     "(default: %g%%)\n", sins);
     printf("         (only with item insertions, option -u)\n");
-//    printf("-T#      t-norm for combining item penalties      "
-//                    "(default: %c)\n",   tnorm);
-//    printf("-u#      minimum weight of a transaction          "
-//                    "(default: %g)\n",   twgt);
-//    printf("         (a value >= 0 selects item insertions)\n");
-//    printf("-e#      additional evaluation measure            "
-//                    "(default: none)\n");
-//    printf("-d#      threshold for add. evaluation measure    "
-//                    "(default: %g%%)\n", thresh);
-//    printf("-q#      sort items w.r.t. their frequency        "
-//                    "(default: %d)\n", sort);
-//    printf("         (1: ascending, -1: descending, 0: do not sort,\n"
-//           "          2: ascending, -2: descending w.r.t. "
-//                    "transaction size sum)\n");
-//    printf("-A#      variant of the relim algorithm to use    "
-//                    "(default: %c)\n", algo);
-//    printf("-x       do not prune with perfect extensions     "
-//                    "(default: prune)\n");
-//    printf("-l#      number of items for k-items machine      "
-//                    "(default: %d)\n", pack);
-//    printf("-y#      threshold for transaction list sorting   "
-//                    "(default: %"ITEM_FMT")\n", slist);
-//    printf("-F#:#..  support border for filtering item sets   "
-//                    "(default: none)\n");
-//    printf("         (list of minimum support values, "
-//                    "one per item set size,\n");
-//    printf("         starting at the minimum size, "
-//                    "as given with option -m#)\n");
-//    printf("-R#      read item selection/insertion penalties\n");
-//    printf("-P#      write a pattern spectrum to a file\n");
-//    printf("-Z       print item set statistics "
-//                    "(number of item sets per size)\n");
-//    printf("-N       do not pre-format some integer numbers   "
-//                    "(default: do)\n");
-//    printf("-g       write output in scanable form "
-//                    "(quote certain characters)\n");
-//    #ifdef USE_ZLIB             /* if optional output compression */
-//    printf("-z       compress output with zlib (deflate)      "
-//                    "(default: plain text)\n");
-//    #endif                      /* print compression option */
-//    printf("-h#      record header  for output                "
-//                    "(default: \"%s\")\n", hdr);
-//    printf("-k#      item separator for output                "
-//                    "(default: \"%s\")\n", sep);
-//    printf("-v#      output format for item set information   "
-//                    "(default: \"%s\")\n", info);
-//    printf("-w       integer transaction weight in last field "
-//                    "(default: only items)\n");
-//    printf("-r#      record/transaction separators            "
-//                    "(default: \"\\n\")\n");
-//    printf("-f#      field /item        separators            "
-//                    "(default: \" \\t,\")\n");
-//    printf("-b#      blank   characters                       "
-//                    "(default: \" \\t\\r\")\n");
-//    printf("-C#      comment characters                       "
-//                    "(default: \"#\")\n");
-//    printf("-!       print additional option information\n");
+    printf("-T#      t-norm for combining item penalties      "
+                    "(default: %c)\n",   tnorm);
+    printf("-u#      minimum weight of a transaction          "
+                    "(default: %g)\n",   twgt);
+    printf("         (a value >= 0 selects item insertions)\n");
+    printf("-e#      additional evaluation measure            "
+                    "(default: none)\n");
+    printf("-d#      threshold for add. evaluation measure    "
+                    "(default: %g%%)\n", thresh);
+    printf("-q#      sort items w.r.t. their frequency        "
+                    "(default: %d)\n", sort);
+    printf("         (1: ascending, -1: descending, 0: do not sort,\n"
+           "          2: ascending, -2: descending w.r.t. "
+                    "transaction size sum)\n");
+    printf("-A#      variant of the relim algorithm to use    "
+                    "(default: %c)\n", algo);
+    printf("-x       do not prune with perfect extensions     "
+                    "(default: prune)\n");
+    printf("-l#      number of items for k-items machine      "
+                    "(default: %d)\n", pack);
+    printf("-y#      threshold for transaction list sorting   "
+                    "(default: %"ITEM_FMT")\n", slist);
+    printf("-F#:#..  support border for filtering item sets   "
+                    "(default: none)\n");
+    printf("         (list of minimum support values, "
+                    "one per item set size,\n");
+    printf("         starting at the minimum size, "
+                    "as given with option -m#)\n");
+    printf("-R#      read item selection/insertion penalties\n");
+    printf("-P#      write a pattern spectrum to a file\n");
+    printf("-Z       print item set statistics "
+                    "(number of item sets per size)\n");
+    printf("-N       do not pre-format some integer numbers   "
+                    "(default: do)\n");
+    printf("-g       write output in scanable form "
+                    "(quote certain characters)\n");
+    #ifdef USE_ZLIB             /* if optional output compression */
+    printf("-z       compress output with zlib (deflate)      "
+                    "(default: plain text)\n");
+    #endif                      /* print compression option */
+    printf("-h#      record header  for output                "
+                    "(default: \"%s\")\n", hdr);
+    printf("-k#      item separator for output                "
+                    "(default: \"%s\")\n", sep);
+    printf("-v#      output format for item set information   "
+                    "(default: \"%s\")\n", info);
+    printf("-w       integer transaction weight in last field "
+                    "(default: only items)\n");
+    printf("-r#      record/transaction separators            "
+                    "(default: \"\\n\")\n");
+    printf("-f#      field /item        separators            "
+                    "(default: \" \\t,\")\n");
+    printf("-b#      blank   characters                       "
+                    "(default: \" \\t\\r\")\n");
+    printf("-C#      comment characters                       "
+                    "(default: \"#\")\n");
+    printf("-!       print additional option information\n");
     printf("infile   file to read transactions from           "
                     "[required]\n");
     printf("outfile  file to write frequent item sets to      "
@@ -1524,7 +1552,6 @@ int main (int argc, char *argv[])
   /* free option characters: acjop [A-Z]\[CFNPRTZ] */
 
   /* --- evaluate arguments --- */
-  printf("--- evaluate arguments ---\n");
   for (i = 1; i < argc; i++) {  /* traverse arguments */
     s = argv[i];                /* get option argument */
     if (optarg) { *optarg = s; optarg = NULL; continue; }
@@ -1617,7 +1644,6 @@ int main (int argc, char *argv[])
   MSG(stderr, "\n");            /* terminate the startup message */
   mode |= REL_VERBOSE|REL_NOCLEAN;
 
-  printf("--- read item selection/insertion penalties ---\n");
   /* --- read item selection/insertion penalties --- */
   ibase = ib_create(0, 0);      /* create an item base */
   if (!ibase) error(E_NOMEM);   /* to manage the items */
@@ -1638,8 +1664,6 @@ int main (int argc, char *argv[])
     MSG(stderr, " done [%.2fs].\n", SEC_SINCE(t));
   }                             /* print a log message */
 
-  printf("--- read item selection/insertion penalties ---\n");
-  //XMSG(stderr, "--- read transaction database ---");
   /* --- read transaction database --- */
   tabag = tbg_create(ibase);    /* create a transaction bag */
   if (!tabag) error(E_NOMEM);   /* to store the transactions */
@@ -1661,9 +1685,6 @@ int main (int argc, char *argv[])
     error(E_NOITEMS);           /* and at least one transaction */
   MSG(stderr, "\n");            /* terminate the log message */
 
-  printf("\n\n");
-  printf("--- find frequent item sets ---\n");
-  //XMSG(stderr, "--- find frequent item sets ---");
   /* --- find frequent item sets --- */
   relim = relim_create(target, supp, sins, zmin, zmax, tnorm, twgt,
                        eval, thresh, algo, mode);
@@ -1671,24 +1692,19 @@ int main (int argc, char *argv[])
   k = relim_data(relim, tabag, sort);
   if (k) error(k);              /* prepare data for split and merge */
   report = isr_create(ibase);   /* create an item set reporter */
-
   if (!report) error(E_NOMEM);  /* and configure it */
   k = relim_report(relim, report);
   if (k) error(k);              /* prepare reporter for relim */
   if (setbdr(report, w, zmin, &border, bdrcnt) != 0)
-    printf("--- err 01 ---\n");
     error(E_NOMEM);             /* set the support border */
   if (fn_psp && (isr_addpsp(report, NULL) < 0))
-    printf("--- err 02 ---\n");
     error(E_NOMEM);             /* set a pattern spectrum if req. */
   if (isr_setfmt(report, scan, hdr, sep, NULL, info) != 0)
-    printf("--- err 03 ---\n");
     error(E_NOMEM);             /* set the output format strings */
   k = isr_open(report, NULL, fn_out);
   if (k) error(k, isr_name(report));
   if (isr_setup(report) < 0)     /* open the item set file and */
     error(E_NOMEM);              /* set up the item set reporter */
-  printf("--- relim_mine ---\n");
   k = relim_mine(relim, slist);  /* find frequent item sets */
   if (k) error(k);
   if (stats)                    /* print item set statistics */
@@ -1696,8 +1712,6 @@ int main (int argc, char *argv[])
   if (isr_close(report) != 0)   /* close item set output file */
     error(E_FWRITE, isr_name(report));
 
-  printf("\n\n");
-  printf("--- write pattern spectrum ---\n");
   /* --- write pattern spectrum --- */
   if (fn_psp) {                 /* if to write a pattern spectrum */
     CLOCK(t);                   /* start timer, create table write */
@@ -1722,4 +1736,3 @@ int main (int argc, char *argv[])
 }  /* main() */
 
 #endif
-
