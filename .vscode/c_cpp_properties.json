@@ -6,7 +6,7 @@
                 "${workspaceFolder}/**"
             ],
             "defines": [
-                "RELIM_MAIN"
+                "RELIM_MAIN", "TA_READ"
             ],
             "macFrameworkPath": [
                 "/System/Library/Frameworks",
