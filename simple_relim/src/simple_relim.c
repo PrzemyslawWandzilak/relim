@@ -3,59 +3,23 @@
   Contents: relim algorithm for finding frequent item sets
   Author  : Christian Borgelt
   Editor  : Pshemy Wandzillak
-  History : 2004.11.05 file created from eclat.c
+  History : 
+            2004.11.05 file created from eclat.c
             2004.11.17 first reasonably fast version completed
-            2004.11.18 start of loop over transactions lists improved
-            2004.11.23 absolute/relative support output changed
-            2004.12.09 filter added (binary logarithm of supp. quotient)
-            2005.06.20 use of flag for "no item sorting" corrected
-            2006.11.26 adapted to new structures ISFMTR and ISEVAL
-            2007.02.13 adapted to modified module tabread
-            2008.05.02 default limit for maximal number of items removed
-            2008.10.13 adapted to modified module "tract", some redesign
-            2008.10.15 simplification of the recursion parameters
-            2008.10.29 reading item insertion penalties added
-            2008.11.03 mining with insertion penalties added
-            2008.11.11 adapted to insertion penalties in item base
-            2008.11.13 adapted to changes in transaction management
-            2008.11.19 sorting transaction list before processing added
-            2008.12.05 perfect extension pruning added (optional)
-            2008.12.11 special function for unlimited insertions added
-            2009.05.28 adapted to modified function tbg_filter()
-            2009.10.15 adapted to item set counter in reporter
-            2009.10.16 closed and maximal item set mining added
-            2010.03.04 sorting improved (appending the rest list)
-            2010.03.10 projection memory combined into one block
+            (..)
             2010.03.15 bug in combined memory deallocation fixed
+            (..)
             2010.03.18 recording of actual number of occurrences added
             2010.04.07 threshold for both item set support and weight
+            (..)
             2010.07.14 output file made optional (for benchmarking)
-            2010.08.19 item selection file added as optional input
-            2010.08.22 adapted to modified modules tabread and tract
-            2010.10.15 adapted to modified interface of module report
-            2010.11.05 clearer interpretation of minimum support
-            2010.11.24 adapted to modified error reporting (tract)
-            2010.12.11 adapted to a generic error reporting function
-            2011.03.16 closed/maximal item sets with item insertions
-            2011.03.20 optional integer transaction weights added
-            2011.05.30 item weight combination with t-norms added
-            2011.06.02 initialize header table with memset()
-            2011.07.08 adapted to modified function tbg_recode()
-            2011.08.28 output of item set counters per size added
-            2011.08.29 16 items machine added (without item insertions)
-            2013.04.01 adapted to type changes in module tract
-            2013.10.15 checks of return code of isr_report() added
-            2013.10.18 optional pattern spectrum collection added
-            2013.11.12 item insertion penalties changed to option -R#
-            2014.05.12 option -F# added (support border for filtering)
-            2014.08.02 option -c renamed to -i (min. supp. with insert.)
-            2014.08.28 functions rel_data() and rel_report() added
-            2014.10.24 changed from LGPL license to MIT license
-            2016.02.19 added pre-formatting for some integer numbers
+            (..)
             2016.11.25 relim miner object and interface introduced
             2017.05.30 optional output compression with zlib added
             2017.07.04 tree-based algorithm variant added
             2017.07.06 use of 16-items machine in tree-based algorithm
+            (..)
+            2019.06.01 Pshemy: move history to git
 ------------------------------------------------------------------------
   Reference for the RElim algorithm:
     C. Borgelt.
