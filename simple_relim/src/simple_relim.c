@@ -1456,63 +1456,63 @@ int main (int argc, char *argv[])
     printf("-i#      minimum support with item insertions     "
                     "(default: %g%%)\n", sins);
     printf("         (only with item insertions, option -u)\n");
-    printf("-T#      t-norm for combining item penalties      "
-                    "(default: %c)\n",   tnorm);
-    printf("-u#      minimum weight of a transaction          "
-                    "(default: %g)\n",   twgt);
-    printf("         (a value >= 0 selects item insertions)\n");
-    printf("-e#      additional evaluation measure            "
-                    "(default: none)\n");
-    printf("-d#      threshold for add. evaluation measure    "
-                    "(default: %g%%)\n", thresh);
-    printf("-q#      sort items w.r.t. their frequency        "
-                    "(default: %d)\n", sort);
-    printf("         (1: ascending, -1: descending, 0: do not sort,\n"
-           "          2: ascending, -2: descending w.r.t. "
-                    "transaction size sum)\n");
-    printf("-A#      variant of the relim algorithm to use    "
-                    "(default: %c)\n", algo);
-    printf("-x       do not prune with perfect extensions     "
-                    "(default: prune)\n");
-    printf("-l#      number of items for k-items machine      "
-                    "(default: %d)\n", pack);
-    printf("-y#      threshold for transaction list sorting   "
-                    "(default: %"ITEM_FMT")\n", slist);
-    printf("-F#:#..  support border for filtering item sets   "
-                    "(default: none)\n");
-    printf("         (list of minimum support values, "
-                    "one per item set size,\n");
-    printf("         starting at the minimum size, "
-                    "as given with option -m#)\n");
-    printf("-R#      read item selection/insertion penalties\n");
-    printf("-P#      write a pattern spectrum to a file\n");
-    printf("-Z       print item set statistics "
-                    "(number of item sets per size)\n");
-    printf("-N       do not pre-format some integer numbers   "
-                    "(default: do)\n");
-    printf("-g       write output in scanable form "
-                    "(quote certain characters)\n");
-    #ifdef USE_ZLIB             /* if optional output compression */
-    printf("-z       compress output with zlib (deflate)      "
-                    "(default: plain text)\n");
-    #endif                      /* print compression option */
-    printf("-h#      record header  for output                "
-                    "(default: \"%s\")\n", hdr);
-    printf("-k#      item separator for output                "
-                    "(default: \"%s\")\n", sep);
-    printf("-v#      output format for item set information   "
-                    "(default: \"%s\")\n", info);
-    printf("-w       integer transaction weight in last field "
-                    "(default: only items)\n");
-    printf("-r#      record/transaction separators            "
-                    "(default: \"\\n\")\n");
-    printf("-f#      field /item        separators            "
-                    "(default: \" \\t,\")\n");
-    printf("-b#      blank   characters                       "
-                    "(default: \" \\t\\r\")\n");
-    printf("-C#      comment characters                       "
-                    "(default: \"#\")\n");
-    printf("-!       print additional option information\n");
+//    printf("-T#      t-norm for combining item penalties      "
+//                    "(default: %c)\n",   tnorm);
+//    printf("-u#      minimum weight of a transaction          "
+//                    "(default: %g)\n",   twgt);
+//    printf("         (a value >= 0 selects item insertions)\n");
+//    printf("-e#      additional evaluation measure            "
+//                    "(default: none)\n");
+//    printf("-d#      threshold for add. evaluation measure    "
+//                    "(default: %g%%)\n", thresh);
+//    printf("-q#      sort items w.r.t. their frequency        "
+//                    "(default: %d)\n", sort);
+//    printf("         (1: ascending, -1: descending, 0: do not sort,\n"
+//           "          2: ascending, -2: descending w.r.t. "
+//                    "transaction size sum)\n");
+//    printf("-A#      variant of the relim algorithm to use    "
+//                    "(default: %c)\n", algo);
+//    printf("-x       do not prune with perfect extensions     "
+//                    "(default: prune)\n");
+//    printf("-l#      number of items for k-items machine      "
+//                    "(default: %d)\n", pack);
+//    printf("-y#      threshold for transaction list sorting   "
+//                    "(default: %"ITEM_FMT")\n", slist);
+//    printf("-F#:#..  support border for filtering item sets   "
+//                    "(default: none)\n");
+//    printf("         (list of minimum support values, "
+//                    "one per item set size,\n");
+//    printf("         starting at the minimum size, "
+//                    "as given with option -m#)\n");
+//    printf("-R#      read item selection/insertion penalties\n");
+//    printf("-P#      write a pattern spectrum to a file\n");
+//    printf("-Z       print item set statistics "
+//                    "(number of item sets per size)\n");
+//    printf("-N       do not pre-format some integer numbers   "
+//                    "(default: do)\n");
+//    printf("-g       write output in scanable form "
+//                    "(quote certain characters)\n");
+//    #ifdef USE_ZLIB             /* if optional output compression */
+//    printf("-z       compress output with zlib (deflate)      "
+//                    "(default: plain text)\n");
+//    #endif                      /* print compression option */
+//    printf("-h#      record header  for output                "
+//                    "(default: \"%s\")\n", hdr);
+//    printf("-k#      item separator for output                "
+//                    "(default: \"%s\")\n", sep);
+//    printf("-v#      output format for item set information   "
+//                    "(default: \"%s\")\n", info);
+//    printf("-w       integer transaction weight in last field "
+//                    "(default: only items)\n");
+//    printf("-r#      record/transaction separators            "
+//                    "(default: \"\\n\")\n");
+//    printf("-f#      field /item        separators            "
+//                    "(default: \" \\t,\")\n");
+//    printf("-b#      blank   characters                       "
+//                    "(default: \" \\t\\r\")\n");
+//    printf("-C#      comment characters                       "
+//                    "(default: \"#\")\n");
+//    printf("-!       print additional option information\n");
     printf("infile   file to read transactions from           "
                     "[required]\n");
     printf("outfile  file to write frequent item sets to      "
