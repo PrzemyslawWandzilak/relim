@@ -1684,6 +1684,7 @@ int main (int argc, char *argv[])
   if (k) error(k, isr_name(report));
   if (isr_setup(report) < 0)     /* open the item set file and */
     error(E_NOMEM);              /* set up the item set reporter */
+  printf("--- relim_mine ---\n");
   k = relim_mine(relim, slist);  /* find frequent item sets */
   if (k) error(k);
   if (stats)                    /* print item set statistics */
