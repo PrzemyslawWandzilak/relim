@@ -393,11 +393,11 @@ SORT(sort_wgt, TZLE)
 
 static int recurse (RELIM *relim, TSLIST *lists, ITEM k, TID n)
 {                               /* --- recursive elimination (arrays) */
-  int    r;                     /* status indicator */
+  int    status;                     /* status indicator */
   TSLIST *proj  = NULL;         /* list(s) of (projected) database */
   TSLE   *elems = NULL;         /* to traverse the transaction lists */
-  TSLIST *cur, *tal;            /* current/projected transaction list */
-  TSLE   *src, *dst;            /* to traverse the transaction lists */
+  TSLIST *cur_tl, *tal;            /* current/projected transaction list */
+  TSLE   *src_el, *dst_el;      /* to traverse the transaction lists */
   SUPP   pex;                   /* minimum support for perfect exts. */
 
   assert(relim && lists && (k > 0)); /* check the function arguments */
@@ -414,49 +414,60 @@ static int recurse (RELIM *relim, TSLIST *lists, ITEM k, TID n)
   }                             /* initialize the projection header */
   pex = (relim->mode & REL_PERFECT)
       ? isr_supp(relim->report) : SUPP_MAX;
-  for (r = 0; --k >= 0; ) {     /* traverse the transaction lists */
-    cur = lists +k;             /* get the next transaction list */
-    if      (cur->occ >= pex)   /* if item is a perfect extension, */
+  XMSG(stderr, "Perfect ext pex=%x\n", pex);
+  
+  for (status = 0; --k >= 0; ) {     /* traverse the transaction lists */
+  XMSG(stderr, "Traverse transaction lists r=%d k=%d\n", 
+                status, k);
+    cur_tl = lists +k;             /* get the next transaction list */
+    if      (cur_tl->occ >= pex)   /* if item is a perfect extension, */
       isr_addpex(relim->report, k);/* add it to the item set reporter */
-    else if (cur->occ >= relim->supp) {  /* if support is high enough */
-      r = isr_add(relim->report, k, cur->occ);
-      if (r < 0) break;         /* add current item to the reporter */
-      if (r > 0) {              /* if the item needs processing */
-        if (cur->head && proj){ /* if another item can be added */
-          if (cur->head->succ   /* if list has more than one element */
+    else if (cur_tl->occ >= relim->supp) {  /* if support is high enough */
+      XMSG(stderr, "curr->occ=%d >= %d\n", cur_tl->occ, relim->supp);
+      status = isr_add(relim->report, k, cur_tl->occ);
+      if (status < 0) {
+        XMSG(stderr, "Break add curr to reporter\n");
+        break;         /* add current item to the reporter */
+      }
+      if (status > 0) {              /* if the item needs processing */
+        if (cur_tl->head && proj){ /* if another item can be added */
+          if (cur_tl->head->succ   /* if list has more than one element */
           && (k <= relim->sort))/* and there are few enough items, */
-            cur->head = sort(cur->head);   /* sort the trans. list */
-          dst = elems;          /* traverse list for current item */
-          for (src = cur->head; src; src = src->succ) {
-            tal = proj +*src->items;  /* get the first item and */
-            tal->occ  += src->occ;    /* sum the transaction weight */
-            if (src->items[1] < 0) continue;
-            dst->items = src->items+1;
-            dst->occ   = src->occ;    /* copy the item array and */
-            dst->succ  = tal->head;   /* the number of occurrences */
-            tal->head  = dst++; /* add the new element at the head */
+            cur_tl->head = sort(cur_tl->head);   /* sort the trans. list */
+          dst_el = elems;          /* traverse list for current item */
+          XMSG(stderr, "Cpy array at the head of corresponding list\n");
+          for (src_el = cur_tl->head; src_el; src_el = src_el->succ) {
+            tal = proj +*src_el->items;  /* get the first item and */
+            tal->occ  += src_el->occ;    /* sum the transaction weight */
+            if (src_el->items[1] < 0) continue;
+            dst_el->items = src_el->items+1;
+            dst_el->occ   = src_el->occ;    /* copy the item array and */
+            dst_el->succ  = tal->head;   /* the number of occurrences */
+            tal->head  = dst_el++; /* add the new element at the head */
           }                     /* of the corresponding list */
-          r = recurse(relim, proj, k, (TID)(dst-elems));
-          if (r < 0) break;     /* find frequent item sets */
+          XMSG(stderr, "\n\nRecurse lists=%x num_it=%d dst_el=%d elems=%d\n",
+                proj, k, dst_el, elems);
+          status = recurse(relim, proj, k, (TID)(dst_el-elems));
+          if (status < 0) break;     /* find frequent item sets */
         }                       /* recursively in the projection */
-        r = isr_report(relim->report);
-        if (r < 0) break;       /* report the current item set */
+        status = isr_report(relim->report);
+        if (status < 0) break;       /* report the current item set */
         isr_remove(relim->report, 1);
       }                         /* remove the current item */
     }                           /* from the item set reporter */
-    cur->occ = 0;               /* clear the number of occurrences */
-    while (cur->head) {         /* while the list is not empty, */
-      src       = cur->head;    /* remove the first element and */
-      cur->head = src->succ;    /* get the list of the first item */
-      tal = lists +*src->items++;
-      tal->occ += src->occ;     /* sum the number of occurrences */
-      if (*src->items < 0) continue;
-      src->succ = tal->head;    /* reassign the transactions */
-      tal->head = src;          /* based on their first items */
+    cur_tl->occ = 0;               /* clear the number of occurrences */
+    while (cur_tl->head) {         /* while the list is not empty, */
+      src_el       = cur_tl->head;    /* remove the first element and */
+      cur_tl->head = src_el->succ;    /* get the list of the first item */
+      tal = lists +*src_el->items++;
+      tal->occ += src_el->occ;     /* sum the number of occurrences */
+      if (*src_el->items < 0) continue;
+      src_el->succ = tal->head;    /* reassign the transactions */
+      tal->head = src_el;          /* based on their first items */
     }                           /* and skip this first item */
   }
   if (proj) free(proj);         /* delete the list and element arrays */
-  return r;                     /* return the error status */
+  return status;                     /* return the error status */
 }  /* recurse() */
 
 /*--------------------------------------------------------------------*/
@@ -468,7 +479,7 @@ static int recurse (RELIM *relim, TSLIST *lists, ITEM k, TID n)
 int relim_base (RELIM *relim)
 {                               /* --- recursive elimination (arrays) */
   int    r;                     /* result of recursion */
-  ITEM   i, k;                  /* loop variable, number of items */
+  ITEM   i, j, k;                  /* loop variable, number of items */
   TID    n;                     /* number of transactions */
   TRACT  *t;                    /* to traverse the transactions */
   TSLIST *lists, *tal;          /* (array of) transaction list(s) */
