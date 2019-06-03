@@ -1,9 +1,11 @@
 /*----------------------------------------------------------------------
-  File    : relim.h
+  File    : relim.c
   Contents: relim algorithm for finding frequent item sets
   Author  : Christian Borgelt
-  History : 2013.11.20 file created
-            2014.08.22 interface of function relim() changed
+  Editor  : Pshemy Wandzillak
+  History : 
+            2004.11.05 file created from eclat.c
+            2004.11.22 interface of function relim() changed
             2014.08.28 functions rel_data() and rel_report() added
             2017.05.30 optional output compression with zlib added
 ----------------------------------------------------------------------*/

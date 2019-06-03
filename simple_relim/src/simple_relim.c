@@ -406,6 +406,7 @@ static int recurse (RELIM *relim, TSLIST *lists, ITEM k, TID n)
   #endif                        /* abort the recursion */
   if ((k > 1)                   /* if there is more than one item and */
   &&  isr_xable(relim->report, 2)) {     /* another item can be added */
+    XMSG(stderr, "\nOrganise projection\n");
     proj = (TSLIST*)malloc((size_t)(k-1) *sizeof(TSLIST)
                           +(size_t) n    *sizeof(TSLE));
     if (!proj) return -1;       /* allocate list and element arrays */
@@ -493,22 +494,36 @@ int relim_base (RELIM *relim)
     return 0;                   /* check the total transaction weight */
 
   k = tbg_itemcnt(relim->tabag);/* get and check the number of items */
+  // XMSG(stderr, "[%"SIZE_FMT" set(s)]", isr_repcnt(relim->report));
+  XMSG(stderr, "\n");
+  XMSG(stderr, "[%d number of items]\n", k);
   if (k <= 0)
     return isr_report(relim->report);
 
   n = tbg_cnt(relim->tabag);    /* get the number of transactions */
+  XMSG(stderr, "[%d number of transactions]\n", n);
 
   // allocate memory for the transaction list
+  // k items * sizeof(transaction_suffix_list) +
+  // n transactions * sizeof(transaction_list_element)
   lists = (TSLIST*)malloc((size_t)k *sizeof(TSLIST)
                          +(size_t)n *sizeof(TSLE));
 
   if (!lists) return -1;        /* allocate lists and element arrays */
+
   dst = elems = (TSLE*)(lists +k);       /* and initialize the lists */
   memset(lists, 0, (size_t)k *sizeof(TSLIST));
 
   while (--n >= 0) {            /* traverse the transactions */
     t = tbg_tract(relim->tabag, n); /* get the current transaction */
+    XMSG(stderr, "[%d] TRACT size=%02d mark=%d wgt=%d first=%d\n", 
+                   n, ta_size(t), t->mark, t->wgt, *ta_items(t));
     dst->items = ta_items(t);       /* and its item array */
+    XMSG(stderr, "  Items= ");
+    for (j=0; j<ta_size(t); j++) {
+      XMSG(stderr, "%d, ", dst->items[j]);
+    }
+    XMSG(stderr, "\n");
     i = *dst->items++;          /* get the first item and skip it */
     if (i < 0) continue;        /* skip empty transactions */
     tal = lists +i;             /* otherwise sum transaction weight */
@@ -517,6 +532,8 @@ int relim_base (RELIM *relim)
     dst->succ = tal->head;      /* skip one element transactions */
     tal->head = dst++;          /* add the new element to the */
   }                             /* list for the first item */
+  XMSG(stderr, "\nRecurse lists=%x num_it=%d dst=%d elems=%d\n", 
+                lists, k, dst, elems);
   r = recurse(relim, lists, k, (TID)(dst-elems));
   free(lists);                  /* execute recursive elimination */
   if (r >= 0)                   /* finally report the empty item set */
@@ -1678,14 +1695,14 @@ int main (int argc, char *argv[])
     MSG(stderr, " done [%.2fs].\n", SEC_SINCE(t));
   }                             /* print a log message */
 
-  printf("--- read item selection/insertion penalties ---\n");
-  //XMSG(stderr, "--- read transaction database ---");
+  printf("--- read transaction database ---\n");
   /* --- read transaction database --- */
   tabag = tbg_create(ibase);    /* create a transaction bag */
   if (!tabag) error(E_NOMEM);   /* to store the transactions */
   CLOCK(t);                     /* start timer, open input file */
   if (trd_open(tread, NULL, fn_inp) != 0)
     error(E_FOPEN, trd_name(tread));
+  printf("Use transaction reader to populate bag\n");
   MSG(stderr, "reading %s ... ", trd_name(tread));
   k = tbg_read(tabag, tread, mtar);
   if (k < 0) error(-k, tbg_errmsg(tabag, NULL, 0));
